@@ -1,4 +1,4 @@
-# Agent Discovery SDK
+# PayeLink Agent Discovery SDK
 
 > Discover AI agents across protocols (A2A, ACP, ANS) with a single search query.
 
