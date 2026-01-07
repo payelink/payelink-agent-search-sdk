@@ -20,6 +20,7 @@ class SearchRequest(BaseModel):
     capability: Optional[Literal['streaming', 'pushNotifications']] = Field(None, description="The capability the agent should support")
     default_input_mode: Optional[List[InputMode]] = Field(None, description="The default input mode the agent should support")
     default_output_mode: Optional[List[OutputMode]] = Field(None, description="The default output mode the agent should support")
+    search_depth: Optional[Literal["advanced", "basic"]] = Field(None, description="Controls the latency vs. relevance tradeoff ")
 
 
 class AgentDetails(BaseModel):
