@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Any, List, Literal
+from typing import Optional, List, Literal
 
 InputMode = Literal[
     "text/plain",
@@ -26,7 +26,7 @@ class SearchRequest(BaseModel):
 class AgentDetails(BaseModel):
     agent_name: Optional[str] = Field(None, description="The name of the agent")
     agent_description: Optional[str] = Field(None, description="The description of the agent")
-    agent_card_url: Optional[str] = Field(None, description="The URL of the agent's card")
+    agent_url: Optional[str] = Field(None, description="The URL of the agent's card")
     organization_name: Optional[str] = Field(None, description="The name of the organization")
     organization_url: Optional[str] = Field(None, description="The URL of the organization")
 

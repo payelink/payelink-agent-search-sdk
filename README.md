@@ -1,15 +1,11 @@
 # PayeLink Agent Discovery SDK
 
-> Discover AI agents across protocols (A2A, ACP, ANS) with a single search query.
-
 [![PyPI version](https://badge.fury.io/py/payelink-agent-search.svg)](https://badge.fury.io/py/payelink-agent-search)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
 ## What is this?
 
-AI agents are multiplying across different protocols and organizations, but there's no easy way to discover them. This SDK solves that.
-
-**Think of it as Google for AI agents** — search once, discover agents from anywhere.
+AI agents are multiplying across different protocols and organizations, but there's no easy way to discover them. This SDK solves that,search once, discover agents from anywhere.
 
 ## Installation
 
