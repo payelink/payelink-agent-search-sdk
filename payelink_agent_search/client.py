@@ -21,7 +21,7 @@ class AgentSearchClient:
     
     api_key : str, optional
         API key for authenticating requests. If not provided, the client will
-        attempt to read from the PAYELINK_AGENT_SEARCH_API_KEY environment variable.
+        attempt to read from the PAYELINK_KEY environment variable.
         The API key is sent as a Bearer token in the Authorization header.
     """
 
@@ -31,7 +31,7 @@ class AgentSearchClient:
         api_key: Optional[str] = None,
     ):
         # Use provided API key or fall back to environment variable
-        resolved_api_key = api_key or os.getenv("PAYELINK_AGENT_SEARCH_API_KEY")
+        resolved_api_key = api_key or os.getenv("PAYELINK_KEY")
         
         self._config = ClientConfig(
             retries=retries,

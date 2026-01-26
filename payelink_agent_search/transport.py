@@ -41,7 +41,7 @@ class Transport:
                     error_msg = f"HTTP {response.status_code} calling {url}"
                     if response.status_code == 401:
                         if not self._config.api_key:
-                            error_msg += " (Authentication failed: API key is missing. Provide it via api_key parameter or PAYELINK_AGENT_SEARCH_API_KEY environment variable)"
+                            error_msg += " (Authentication failed: API key is missing. Provide it via api_key parameter or PAYELINK_KEY environment variable)"
                         else:
                             error_msg += " (Authentication failed: Invalid API key)"
                     raise HttpStatusError(
