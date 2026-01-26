@@ -38,9 +38,15 @@ class Transport:
                 response = self._client.post(url, json=payload)
 
                 if response.status_code >= 400:
+                    error_msg = f"HTTP {response.status_code} calling {url}"
+                    if response.status_code == 401:
+                        if not self._config.api_key:
+                            error_msg += " (Authentication failed: API key is missing. Provide it via api_key parameter or PAYELINK_AGENT_SEARCH_API_KEY environment variable)"
+                        else:
+                            error_msg += " (Authentication failed: Invalid API key)"
                     raise HttpStatusError(
                         response.status_code,
-                        f"HTTP {response.status_code} calling {url}",
+                        error_msg,
                         body=response.text
                     )
 

@@ -1,3 +1,4 @@
+import os
 from typing import Optional, Literal, List
 from .config import ClientConfig
 from .transport import Transport
@@ -12,6 +13,16 @@ class AgentSearchClient:
     - Discover other agents by semantic intent
     - Apply hard constraints (country, capability, IO modes)
     - Retrieve agent cards for invocation
+
+    Parameters
+    ----------
+    retries : int, default=2
+        Number of retry attempts for failed requests.
+    
+    api_key : str, optional
+        API key for authenticating requests. If not provided, the client will
+        attempt to read from the PAYELINK_AGENT_SEARCH_API_KEY environment variable.
+        The API key is sent as a Bearer token in the Authorization header.
     """
 
     def __init__(
@@ -19,8 +30,12 @@ class AgentSearchClient:
         retries: int = 2,
         api_key: Optional[str] = None,
     ):
+        # Use provided API key or fall back to environment variable
+        resolved_api_key = api_key or os.getenv("PAYELINK_AGENT_SEARCH_API_KEY")
+        
         self._config = ClientConfig(
             retries=retries,
+            api_key=resolved_api_key,
         )
 
         self._transport = Transport(self._config)
@@ -94,7 +109,7 @@ class AgentSearchClient:
         )
 
         raw = self._transport.post_json(
-            "/search", request.model_dump(exclude_none=True)
+            "/v1/agents/search", request.model_dump(exclude_none=True)
         )
 
         agents = [AgentDetails(**agent) for agent in raw.get("data", [])]
