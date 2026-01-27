@@ -13,6 +13,15 @@ AI agents are multiplying across different protocols and organizations, but ther
 pip install payelink-agent-search
 ```
 
+## Version
+
+To check the installed version:
+
+```python
+from payelink_agent_search import __version__
+print(__version__)  # e.g., "0.1.6"
+```
+
 ## Quick Start
 
 ```python
@@ -70,6 +79,41 @@ with AgentSearchClient() as client:
     # Client auto-closes
 ```
 
+### Async Support
+```python
+import asyncio
+from payelink_agent_search import AsyncAgentSearchClient
+
+async def main():
+    async with AsyncAgentSearchClient() as client:
+        response = await client.search("translation agent")
+        if response.success:
+            for agent in response.agents:
+                print(f"{agent.agent_name}: {agent.agent_description}")
+
+asyncio.run(main())
+```
+
+### Async with Multiple Searches
+```python
+import asyncio
+from payelink_agent_search import AsyncAgentSearchClient
+
+async def main():
+    async with AsyncAgentSearchClient() as client:
+        # Run multiple searches concurrently
+        results = await asyncio.gather(
+            client.search("currency conversion"),
+            client.search("payment processing"),
+            client.search("translation"),
+        )
+        
+        for response in results:
+            if response.success:
+                print(f"Found {len(response.agents)} agents")
+
+asyncio.run(main())
+```
 
 ### Response Format
 
@@ -150,6 +194,28 @@ except SdkError as e:
     print(f"SDK Error: {e}")
 finally:
     client.close()
+```
+
+### Async Example
+```python
+import asyncio
+from payelink_agent_search import AsyncAgentSearchClient
+from payelink_agent_search.errors import SdkError
+
+async def main():
+    async with AsyncAgentSearchClient() as client:
+        try:
+            response = await client.search("test query")
+            
+            if not response.success:
+                print(f"Error: {response.error}")
+            else:
+                print(f"Success! Found {len(response.agents)} agents")
+                
+        except SdkError as e:
+            print(f"SDK Error: {e}")
+
+asyncio.run(main())
 ```
 
 ## Why Use This?
