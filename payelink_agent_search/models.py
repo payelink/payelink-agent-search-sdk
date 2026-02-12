@@ -21,6 +21,10 @@ class SearchRequest(BaseModel):
     default_input_mode: Optional[List[InputMode]] = Field(None, description="The default input mode the agent should support")
     default_output_mode: Optional[List[OutputMode]] = Field(None, description="The default output mode the agent should support")
     search_depth: Optional[Literal["advanced", "basic"]] = Field(None, description="Controls the latency vs. relevance tradeoff ")
+    allowed_url: Optional[List[str]] = Field(
+        None,
+        description="If set, these URLs are used as the discovered organizations.",
+    )
 
 
 class AgentDetails(BaseModel):

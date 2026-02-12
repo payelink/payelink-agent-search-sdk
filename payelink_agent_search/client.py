@@ -58,6 +58,7 @@ class AgentSearchClient:
         capability: Optional[Literal["streaming", "push_notification"]] = None,
         default_input_mode: Optional[List[InputMode]] = None,
         default_output_mode: Optional[List[OutputMode]] = None,
+        allowed_url: Optional[List[str]] = None,
     ) -> SearchResponse:
         """
         Discover agents that can best handle a given query.
@@ -92,6 +93,9 @@ class AgentSearchClient:
         default_output_mode : {"text", "voice", "image", "video"}, optional
             Primary output modality the agent must support.
 
+        allowed_url : list of str, optional
+            If set, these URLs are used as the discovered organizations.
+
         Returns
         -------
         SearchResponse
@@ -106,6 +110,7 @@ class AgentSearchClient:
             capability=capability,
             default_input_mode=default_input_mode,
             default_output_mode=default_output_mode,
+            allowed_url=allowed_url,
         )
 
         raw = self._transport.post_json(
@@ -174,6 +179,7 @@ class AsyncAgentSearchClient:
         capability: Optional[Literal["streaming", "push_notification"]] = None,
         default_input_mode: Optional[List[InputMode]] = None,
         default_output_mode: Optional[List[OutputMode]] = None,
+        allowed_url: Optional[List[str]] = None,
     ) -> SearchResponse:
         """
         Discover agents that can best handle a given query.
@@ -208,6 +214,9 @@ class AsyncAgentSearchClient:
         default_output_mode : {"text", "voice", "image", "video"}, optional
             Primary output modality the agent must support.
 
+        allowed_url : list of str, optional
+            If set, these URLs are used as the discovered organizations.
+
         Returns
         -------
         SearchResponse
@@ -222,6 +231,7 @@ class AsyncAgentSearchClient:
             capability=capability,
             default_input_mode=default_input_mode,
             default_output_mode=default_output_mode,
+            allowed_url=allowed_url,
         )
 
         raw = await self._transport.post_json(

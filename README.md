@@ -174,6 +174,7 @@ client.close()
 Allowed values:
 - `capability`: `"streaming"` or `"pushNotifications"`
 - `default_input_mode` / `default_output_mode`: `"text/plain"`, `"application/json"`, `"text/markdown"`
+- `allowed_url`: list of URLs; if set, these URLs are used as the discovered organizations
 
 ### Error Handling
 ```python
