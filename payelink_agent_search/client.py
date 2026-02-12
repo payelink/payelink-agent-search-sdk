@@ -122,6 +122,7 @@ class AgentSearchClient:
         return SearchResponse(
             success=True,
             agents=agents,
+            message=raw.get("message"),
             error=None if raw.get("success") else raw.get("error"),
         )
 
@@ -243,5 +244,6 @@ class AsyncAgentSearchClient:
         return SearchResponse(
             success=True,
             agents=agents,
+            message=raw.get("message"),
             error=None if raw.get("success") else raw.get("error"),
         )
