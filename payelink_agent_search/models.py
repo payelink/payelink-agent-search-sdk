@@ -1,5 +1,6 @@
+from typing import List, Literal, Optional
+
 from pydantic import BaseModel, Field
-from typing import Optional, List, Literal
 
 InputMode = Literal[
     "text/plain",
@@ -15,7 +16,9 @@ OutputMode = Literal[
 
 class SearchRequest(BaseModel):
     query: str = Field(..., description="The query to search for")
-    max_result: Optional[int] = Field(10, description="The max number of agents to return")
+    max_result: Optional[int] = Field(
+        10, description="The max number of agents to return"
+    )
     country: Optional[str] = Field(None, description="The country of the agent")
     capability: Optional[Literal['streaming', 'pushNotifications']] = Field(None, description="The capability the agent should support")
     default_input_mode: Optional[List[InputMode]] = Field(None, description="The default input mode the agent should support")

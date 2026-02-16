@@ -1,0 +1,16 @@
+{
+  "organization": {
+    "name": "Acme Finance Ltd",
+    "url": "https://acme.com"
+  },
+  "agents": [
+    {
+      "id": "budget-planner",
+      "card": "https://acme.com/.well-known/agents/budget-planner.json"
+    },
+    {
+      "id": "currency-converter",
+      "card": "https://acme.com/.well-known/agents/currency-converter.json"
+    }
+  ]
+}

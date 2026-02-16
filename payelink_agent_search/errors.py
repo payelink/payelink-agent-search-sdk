@@ -1,5 +1,6 @@
 from typing import Optional
 
+
 class SdkError(Exception):
     """Base class for all SDK errors"""
 

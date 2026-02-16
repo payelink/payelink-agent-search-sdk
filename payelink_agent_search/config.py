@@ -3,6 +3,7 @@ from typing import Dict, Optional
 
 from ._version import __version__
 
+
 @dataclass(frozen=True)
 class ClientConfig:
     base_url: str = "http://127.0.0.1:8000"
