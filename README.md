@@ -1,286 +1,246 @@
-# PayeLink Agent Discovery SDK
+# Payelink Agent Search SDK
 
-[![PyPI version](https://badge.fury.io/py/payelink-agent-search.svg)](https://badge.fury.io/py/payelink-agent-search)
-[![Python 3.8+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+Discover AI agents across organizations using the **Payelink Agent
+Registry Standard**.
 
-## What is this?
+The Payelink Agent Search SDK allows applications and agents to discover
+other agents that are explicitly published by organizations via a
+standardized registry:
 
-AI agents are multiplying across different protocols and organizations, but there's no easy way to discover them. This SDK solves that,search once, discover agents from anywhere.
+    {organization_base_url}/.well-known/agents.json
+
+This SDK is the reference Python implementation of the **Payelink Agent
+Discovery Protocol (v0.1)**.
+
+------------------------------------------------------------------------
+
+## Table of Contents
+
+-   [Overview](#overview)
+-   [Architecture](#architecture)
+-   [Installation](#installation)
+-   [Quick Start](#quick-start)
+-   [Async Usage](#async-usage)
+-   [Filtering & Options](#filtering--options)
+-   [Response Model](#response-model)
+-   [Error Handling](#error-handling)
+-   [Agent Registry Specification (v0.1)](#agent-registry-specification-v01)
+-   [Security Considerations](#security-considerations)
+-   [Stability & Versioning](#stability--versioning)
+-   [Requirements](#requirements)
+-   [License](#license)
+
+------------------------------------------------------------------------
+
+## Overview
+
+AI agents are increasingly hosted by organizations. However, discovering
+them in a standardized and structured way remains fragmented.
+
+The Payelink Agent Search SDK solves this by:
+
+-   Fetching organization-published agent registries
+-   Parsing agent metadata
+-   Returning structured, validated agent results
+-   Supporting sync and async usage
+-   Enabling filtering
+
+Discovery is **explicit and organization-controlled**. Agents are
+discoverable only if their organization lists them in their registry.
+
+------------------------------------------------------------------------
+
+## Architecture
+
+Discovery Flow:
+
+Client Application\
+↓\
+Payelink Agent Search SDK\
+↓\
+Fetch `{org}/.well-known/agents.json`\
+↓\
+Fetch Agent Card(s)\
+↓\
+Return Structured Agent Results
+
+Key Principles:
+
+-   No internet-wide crawling
+-   No scraping
+-   Organization opt-in only
+-   Registry-based discovery
+-   Extensible for identity, payment, and reputation layers
+
+------------------------------------------------------------------------
 
 ## Installation
 
-```bash
+``` bash
 pip install payelink-agent-search
 ```
 
-## Version
-
-To check the installed version:
-
-```python
-from payelink_agent_search import __version__
-print(__version__)  # e.g., "0.1.6"
-```
+------------------------------------------------------------------------
 
 ## Quick Start
 
-```python
+``` python
 from payelink_agent_search import AgentSearchClient
 
-# Create client
 client = AgentSearchClient()
 
-# Search for agents
 response = client.search("Convert USD to KES")
 
-# Use results
 if response.success:
     for agent in response.agents:
         print(f"{agent.agent_name}: {agent.agent_description}")
-        print(f"Endpoint: {agent.agent_card_url}")
-        print("---")
-
-client.close()
-```
-
-## What Gets Discovered?
-
-The SDK searches across multiple sources:
-
-- ✅ **A2A agents** (`/.well-known/agent-card.json`)
-- ✅ **ACP agents** (`/.well-known/agent.yml`)
-- ✅ **Custom registries** (`/agents/public`)
-- ✅ **Open web** (via intelligent search)
-
-**One search, every protocol.**
-
-## Features
-
-### Multi-Protocol Discovery
-```python
-# Automatically searches A2A, ACP, ANS, and custom endpoints
-response = client.search("payment processing agent")
-```
-
-### Filtering
-```python
-response = client.search(
-    query="Currency conversion",
-    country="KE",              # Only Kenya
-    capability="streaming",     # Must support streaming
-    max_result=5
-)
-```
-
-### Context Manager Support
-```python
-with AgentSearchClient() as client:
-    response = client.search("translation agent")
-    # Client auto-closes
-```
-
-### Async Support
-```python
-import asyncio
-from payelink_agent_search import AsyncAgentSearchClient
-
-async def main():
-    async with AsyncAgentSearchClient() as client:
-        response = await client.search("translation agent")
-        if response.success:
-            for agent in response.agents:
-                print(f"{agent.agent_name}: {agent.agent_description}")
-
-asyncio.run(main())
-```
-
-### Async with Multiple Searches
-```python
-import asyncio
-from payelink_agent_search import AsyncAgentSearchClient
-
-async def main():
-    async with AsyncAgentSearchClient() as client:
-        # Run multiple searches concurrently
-        results = await asyncio.gather(
-            client.search("currency conversion"),
-            client.search("payment processing"),
-            client.search("translation"),
-        )
-        
-        for response in results:
-            if response.success:
-                print(f"Found {len(response.agents)} agents")
-
-asyncio.run(main())
-```
-
-### Response Format
-
-```python
-class SearchResponse:
-    success: bool                 # True if request succeeded
-    agents: List[AgentDetails]    # Discovered agents (ranked)
-    error: Optional[str]          # Error message if failed
-
-class AgentDetails:
-    agent_name: str               # Name of the agent
-    agent_description: str        # What it does
-    agent_card_url: str           # URL to invoke agent
-    organization_name: str        # Who built it
-    organization_url: str         # Organization website
-```
-
-## Examples
-
-### Basic Search
-```python
-from payelink_agent_search import AgentSearchClient
-
-client = AgentSearchClient()
-response = client.search("Find weather agents")
-
-if response.success:
-    print(f"Found {len(response.agents)} agents")
-    for agent in response.agents:
-        print(f"- {agent.agent_name}")
-
-client.close()
-```
-
-### Filtered Search
-```python
-client = AgentSearchClient()
-
-# Find agents with specific constraints
-response = client.search(
-    query="Financial services",
-    country="KE",                               # Only agents from Kenya
-    capability="streaming",                     # or "pushNotifications"
-    default_input_mode=["text/plain", "application/json"],
-    default_output_mode=["text/plain", "text/markdown"],
-    max_result=5                                # Top 5 matches (default is 10)
-)
-
-if response.success:
-    for agent in response.agents:
-        print(f"{agent.agent_name} - {agent.organization_name}")
+        print(f"Endpoint: {agent.agent_url}")
 else:
     print(f"Error: {response.error}")
 
 client.close()
 ```
 
-Allowed values:
-- `capability`: `"streaming"` or `"pushNotifications"`
-- `default_input_mode` / `default_output_mode`: `"text/plain"`, `"application/json"`, `"text/markdown"`
-- `allowed_url`: list of URLs; if set, these URLs are used as the discovered organizations
+------------------------------------------------------------------------
 
-### Error Handling
-```python
-from payelink_agent_search import AgentSearchClient
-from payelink_agent_search.errors import SdkError
+## Async Usage
 
-client = AgentSearchClient()
-
-try:
-    response = client.search("test query")
-    
-    if not response.success:
-        print(f"Error: {response.error}")
-    else:
-        print(f"Success! Found {len(response.agents)} agents")
-        
-except SdkError as e:
-    print(f"SDK Error: {e}")
-finally:
-    client.close()
-```
-
-### Async Example
-```python
+``` python
 import asyncio
 from payelink_agent_search import AsyncAgentSearchClient
-from payelink_agent_search.errors import SdkError
 
 async def main():
     async with AsyncAgentSearchClient() as client:
-        try:
-            response = await client.search("test query")
-            
-            if not response.success:
-                print(f"Error: {response.error}")
-            else:
-                print(f"Success! Found {len(response.agents)} agents")
-                
-        except SdkError as e:
-            print(f"SDK Error: {e}")
+        response = await client.search("translation agent")
+        
+        if response.success:
+            for agent in response.agents:
+                print(agent.agent_name)
 
 asyncio.run(main())
 ```
 
-## Why Use This?
+------------------------------------------------------------------------
 
-### Problem
-- No unified way to discover them
-- Manual configuration for each integration
-- Agents can't find other agents to collaborate
+## Filtering & Options
 
-### Solution
-- **One search** across all protocols
-- **Automatic discovery** of agent endpoints
-- **Ranked results** (most relevant first)
-- **Rich metadata** (capabilities, organization, endpoints)
-
-### Use Cases
-
-**1. Agent-to-Agent Collaboration**
-```python
-# Supervisor agent needs a helper
-payment_agent = client.search("payment processing KES").agents[0]
-# Now supervisor can call payment_agent.agent_card_url
+``` python
+response = client.search(
+    query="Financial services",
+    allowed_url=[
+        "https://org1.example.com",
+        "https://org2.example.com"
+    ]
+)
 ```
 
-**2. Dynamic Agent Selection**
-```python
-# Choose best agent at runtime (not hardcoded)
-agents = client.search("translation Spanish to English", max_result=3)
-best_agent = agents.agents[0]  # Highest ranked
+------------------------------------------------------------------------
+
+## Response Model
+
+``` python
+class SearchResponse:
+    success: bool
+    agents: List[AgentDetails]
+    error: Optional[str]
+
+class AgentDetails:
+    agent_id: Optional[str]
+    agent_name: Optional[str]
+    agent_description: Optional[str]
+    agent_url: Optional[str]
+    organization_name: Optional[str]
+    organization_url: Optional[str]
 ```
 
-**3. Multi-Agent Workflows**
-```python
-# Build workflows from discovered agents
-translator = client.search("translation").agents[0]
-analyzer = client.search("sentiment analysis").agents[0]
-mailer = client.search("email agent").agents[0]
-# Chain them together
+------------------------------------------------------------------------
+
+## Error Handling
+
+``` python
+from payelink_agent_search.errors import SdkError
+
+try:
+    response = client.search("test query")
+except SdkError as e:
+    print(f"SDK Error: {e}")
 ```
+
+Error Types:
+
+-   `SdkError`
+-   `HttpStatusError`
+-   `NetworkError`
+-   `TimeoutError`
+-   `InvalidResponseError`
+
+------------------------------------------------------------------------
+
+## Agent Registry Specification (v0.1)
+
+Organizations must expose:
+
+    GET /.well-known/agents.json
+
+Example:
+
+``` json
+{
+  "organization": {
+    "name": "Acme Finance Ltd",
+    "url": "https://acme.com"
+  },
+  "agents": [
+    {
+      "id": "budget-planner",
+      "card": "https://acme.com/.well-known/agents/budget-planner.json"
+    }
+  ]
+}
+```
+
+Each agent card provides extended metadata including:
+
+-   DID-based identity
+-   Capabilities
+-   Skills
+-   Input/output modes
+-   Optional pricing metadata
+
+------------------------------------------------------------------------
+
+## Security Considerations
+
+-   Only declared registries are fetched.
+-   Organizations control discoverability.
+-   Agent cards may include DIDs for identity verification.
+-   Future versions may support signed registries.
+
+------------------------------------------------------------------------
+
+## Stability & Versioning
+
+This SDK is currently in **v0.1.x (early development)**. Pre-1.0 releases are not considered stable.
+
+-   The specification may evolve.
+-   Breaking changes may occur before v1.0.
+-   Schema versions are explicitly declared in registry and agent cards.
+
+------------------------------------------------------------------------
 
 ## Requirements
 
-- Python >= 3.8
-- httpx >= 0.24.0
-- pydantic >= 2.0.0
+-   Python \>= 3.8
+-   httpx \>= 0.24.0
+-   pydantic \>= 2.0.0
 
-## Error Types
-
-- `SdkError` - Base error class
-- `HttpStatusError` - HTTP 4xx/5xx errors
-- `NetworkError` - Network failures
-- `TimeoutError` - Request timeouts
-- `InvalidResponseError` - Malformed responses
-
-## Links
-
-- **Documentation:** [Full docs](https://github.com/your-org/agent-discovery)
-- **Issues:** [GitHub Issues](https://github.com/your-org/agent-discovery/issues)
-- **Source:** [GitHub](https://github.com/your-org/agent-discovery)
+------------------------------------------------------------------------
 
 ## License
 
 MIT License
 
----
+------------------------------------------------------------------------
 
-**Making AI agents discoverable** • Built for the Agent 2.0 era
+Payelink Agent Discovery Protocol • Registry-Based Agent Discovery •
+Infrastructure for Interoperable AI Agents
