@@ -1,12 +1,17 @@
-from .config import ClientConfig
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 import httpx
 
-from .errors import HttpStatusError, InvalidResponseError, NetworkError
+from .config import ClientConfig
+from .errors import HttpStatusError, InvalidResponseError, NetworkError, TimeoutError
 
 
 class Transport:
-    def __init__(self, config: ClientConfig, client: Optional[httpx.Client] = None) -> None:
+    def __init__(
+        self,
+        config: ClientConfig,
+        client: Optional[httpx.Client] = None,
+    ) -> None:
         self._config = config
         self._client = client or httpx.Client(
             base_url=config.base_url.rstrip("/"),
@@ -41,7 +46,9 @@ class Transport:
                     error_msg = f"HTTP {response.status_code} calling {url}"
                     if response.status_code == 401:
                         if not self._config.api_key:
-                            error_msg += " (Authentication failed: API key is missing. Provide it via api_key parameter or PAYELINK_KEY environment variable)"
+                            error_msg += (
+                                " (API key missing: use api_key or PAYELINK_KEY)"
+                            )
                         else:
                             error_msg += " (Authentication failed: Invalid API key)"
                     raise HttpStatusError(
@@ -78,7 +85,11 @@ class Transport:
 
 
 class AsyncTransport:
-    def __init__(self, config: ClientConfig, client: Optional[httpx.AsyncClient] = None) -> None:
+    def __init__(
+        self,
+        config: ClientConfig,
+        client: Optional[httpx.AsyncClient] = None,
+    ) -> None:
         self._config = config
         self._client = client or httpx.AsyncClient(
             base_url=config.base_url.rstrip("/"),
@@ -110,7 +121,9 @@ class AsyncTransport:
                     error_msg = f"HTTP {response.status_code} calling {url}"
                     if response.status_code == 401:
                         if not self._config.api_key:
-                            error_msg += " (Authentication failed: API key is missing. Provide it via api_key parameter or PAYELINK_KEY environment variable)"
+                            error_msg += (
+                                " (API key missing: use api_key or PAYELINK_KEY)"
+                            )
                         else:
                             error_msg += " (Authentication failed: Invalid API key)"
                     raise HttpStatusError(

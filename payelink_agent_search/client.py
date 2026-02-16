@@ -1,8 +1,9 @@
 import os
-from typing import Optional, Literal, List
+from typing import List, Literal, Optional
+
 from .config import ClientConfig
-from .transport import Transport, AsyncTransport
-from .models import AgentDetails, InputMode, SearchRequest, SearchResponse, OutputMode
+from .models import AgentDetails, InputMode, OutputMode, SearchRequest, SearchResponse
+from .transport import AsyncTransport, Transport
 
 
 class AgentSearchClient:
@@ -18,7 +19,7 @@ class AgentSearchClient:
     ----------
     retries : int, default=2
         Number of retry attempts for failed requests.
-    
+
     api_key : str, optional
         API key for authenticating requests. If not provided, the client will
         attempt to read from the PAYELINK_KEY environment variable.
@@ -32,7 +33,7 @@ class AgentSearchClient:
     ):
         # Use provided API key or fall back to environment variable
         resolved_api_key = api_key or os.getenv("PAYELINK_KEY")
-        
+
         self._config = ClientConfig(
             retries=retries,
             api_key=resolved_api_key,
@@ -140,7 +141,7 @@ class AsyncAgentSearchClient:
     ----------
     retries : int, default=2
         Number of retry attempts for failed requests.
-    
+
     api_key : str, optional
         API key for authenticating requests. If not provided, the client will
         attempt to read from the PAYELINK_KEY environment variable.
@@ -154,7 +155,7 @@ class AsyncAgentSearchClient:
     ):
         # Use provided API key or fall back to environment variable
         resolved_api_key = api_key or os.getenv("PAYELINK_KEY")
-        
+
         self._config = ClientConfig(
             retries=retries,
             api_key=resolved_api_key,
